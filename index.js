@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const menu = require('./src/route/menu');
 const chineese = require('./src/route/chineese');
+const user = require('./src/route/user');
 
 const app = express();
 const port = 8000;
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use('/api/v1', menu);
 app.use('/api/v1', chineese);
+app.use('/api/v1', user);
 
 
 const connectDB = async () => {
