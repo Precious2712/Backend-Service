@@ -22,7 +22,7 @@ const subMenuSchema = new Schema(
 );
 
 
-const menuSchema = new Schema(
+const snackSchema = new Schema(
     {
         name: {
             type: String,
@@ -51,6 +51,6 @@ const menuSchema = new Schema(
 );
 
 
-const Chineese = mongoose.model('chineese', menuSchema);
+const Snack = mongoose.model('Snacks', snackSchema);
 
-module.exports = Chineese;
+module.exports = Snack;

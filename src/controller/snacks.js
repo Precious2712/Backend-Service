@@ -1,6 +1,6 @@
-const Menu = require('../model/menu');
+const Snacks = require('../model/snacks');
 
-const createMenu = async (req, res) => {
+const createSnackMenu = async (req, res) => {
     try {
         const { name, price, image, description, subMenu } = req.body;
 
@@ -20,7 +20,7 @@ const createMenu = async (req, res) => {
             subMenu
         };
 
-        const meal = await Menu.create(fields);
+        const meal = await Snacks.create(fields);
 
         return res.status(201).json({
             message: 'Meal created successfully',
@@ -37,11 +37,11 @@ const createMenu = async (req, res) => {
 };
 
 
-const getAllMenu = async (req, res) => {
+const getAllSnacks = async (req, res) => {
     try {
-        const food = await Menu.find();
+        const fastFood = await Snacks.find();
 
-        if (!food) {
+        if (!fastFood) {
             if (!food) {
                 return res.status(400).json({ message: 'Food is empty' });
             }
@@ -49,7 +49,7 @@ const getAllMenu = async (req, res) => {
 
         res.status(201).json({
             message: 'Food found',
-            food
+            fastFood
         });
 
     } catch (error) {
@@ -63,7 +63,8 @@ const getAllMenu = async (req, res) => {
 
 
 
+
 module.exports = {
-    createMenu,
-    getAllMenu
+    createSnackMenu,
+    getAllSnacks
 };

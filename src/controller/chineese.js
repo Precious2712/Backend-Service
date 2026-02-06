@@ -37,8 +37,33 @@ const chineeseMenu = async (req, res) => {
 };
 
 
+const getChineeseMeal = async (req, res) => {
+    try {
+        const asian = await Chineese.find();
+
+        if (!asian) {
+            if (!food) {
+                return res.status(400).json({ message: 'Food is empty' });
+            }
+        }
+
+        res.status(201).json({
+            message: 'Food found',
+            asian
+        });
+
+    } catch (error) {
+        console.error('Error creating menu:', error);
+        return res.status(500).json({
+            message: 'An error occurred',
+            err: error.message
+        });
+    }
+};
+
 
 
 module.exports = {
-    chineeseMenu
+    chineeseMenu,
+    getChineeseMeal
 };
