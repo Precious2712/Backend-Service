@@ -19,13 +19,6 @@ const createUser = async (req, res) => {
             })
         }
 
-        if (!['Male', 'Female'].includes(gender)) {
-            return res.status(400).json({
-                message: 'Gender must be Male or Female'
-            });
-        }
-
-
         const salt = await bcrypt.genSalt(10);
 
         const harshPassword = await bcrypt.hash(password, salt);
