@@ -10,10 +10,10 @@ const generateToken = (id, email) => {
 }
 
 const createUser = async (req, res) => {
-    const { name, email, password, age, gender } = req.body;
+    const { email, password, } = req.body;
 
     try {
-        if (!name || !email || !password || !age) {
+        if (!email || !password) {
             return res.json({
                 message: 'All fields are required'
             })
@@ -31,11 +31,8 @@ const createUser = async (req, res) => {
         const harshPassword = await bcrypt.hash(password, salt);
 
         const user = {
-            name,
             email,
             password: harshPassword,
-            age,
-            gender
         }
 
         const authUser = await Users.create(user);
@@ -89,9 +86,6 @@ const signInUsers = async (req, res) => {
         res.status(201).json({
             message: 'User login successful',
             email: userRef.email,
-            age: userRef.age,
-            gender: userRef.gender,
-            name: userRef.name,
             id: userRef._id,
             token
         })
