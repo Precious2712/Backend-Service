@@ -39,7 +39,7 @@ const createUser = async (req, res) => {
 
     } catch (error) {
         console.log('An error has occur', error.message);
-        res.status(501).json({
+        res.status(500).json({
             message: 'An error has occur',
             err: error
         })
