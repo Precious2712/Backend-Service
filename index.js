@@ -8,6 +8,7 @@ const menu = require('./src/route/menu');
 const chineese = require('./src/route/chineese');
 const user = require('./src/route/user');
 const snack = require('./src/route/snacks');
+const cart = require('./src/route/cart');
 
 const app = express();
 const port = 8000;
@@ -21,6 +22,7 @@ app.use('/api/v1', menu);
 app.use('/api/v1', chineese);
 app.use('/api/v1', user);
 app.use('/api/v1', snack);
+app.use('/api/v1', cart);
 
 
 const connectDB = async () => {

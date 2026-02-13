@@ -7,7 +7,7 @@ const {
     signInUsers,
 } = require('../controller/user');
 
-const userToken = require('../middleware/verifyUserToken');
+// const userToken = require('../middleware/verifyUserToken');
 
 app.post('/create-user', createUser);
 
