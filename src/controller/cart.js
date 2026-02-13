@@ -3,6 +3,13 @@ const Cart = require("../model/cart");
 const createrUserCart = async (req, res) => {
     try {
         const { pickUpLocation, item = [], itemOne = [] } = req.body;
+
+        if (!req.user) {
+            return res.status(401).json({
+                message: "User not authenticated",
+            });
+        }
+
         const id = req.user;
 
         if (!pickUpLocation) {
@@ -17,7 +24,7 @@ const createrUserCart = async (req, res) => {
             });
         }
 
-  
+
         let owner = await Cart.findOne({ userId: id._id });
 
         if (!owner) {
@@ -42,7 +49,7 @@ const createrUserCart = async (req, res) => {
                 }
             });
 
-           
+
             itemOne.forEach((newItem) => {
                 const existing = owner.itemOne.find(
                     (i) => i.imagery === newItem.imagery
@@ -55,7 +62,7 @@ const createrUserCart = async (req, res) => {
                 }
             });
 
-            await owner.save(); 
+            await owner.save();
         }
 
         return res.status(200).json({
