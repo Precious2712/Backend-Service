@@ -9,12 +9,10 @@ const cartItemSchema = new Schema({
     totalPrice: Number,
 });
 
-
 cartItemSchema.pre("save", function () {
     this.sum = this.price * this.quantity;
     this.totalPrice = this.sum;
 });
-
 
 const cartBox = new Schema({
     pickUpLocation: { type: String, required: true },
@@ -24,16 +22,12 @@ const cartBox = new Schema({
     cartTotal: { type: Number, default: 0 },
 });
 
-
-cartBox.pre("save", function (next) {
+cartBox.pre("save", function () {
     const itemTotal = this.item.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
     const extraTotal = this.itemOne.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
 
     this.cartTotal = itemTotal + extraTotal;
-
-    next();
 });
-
 
 const ContainerItem = mongoose.model("carts", cartBox);
 
