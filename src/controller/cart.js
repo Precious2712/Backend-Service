@@ -82,42 +82,141 @@ const createrUserCart = async (req, res) => {
 
 const updateCartItemQuantity = async (req, res) => {
     try {
-        const { cartItemId, type } = req.body; 
+        const { cartItemId, type } = req.body;
         const userId = req.user._id;
 
         const cart = await Cart.findOne({ userId });
 
-        if (!cart) return res.status(404).json({ message: 'Cart not found' });
-
-       
-        let item = cart.item.find(i => i._id.toString() === cartItemId);
-        
-        if (!item) {
-            item = cart.itemOne.find(i => i._id.toString() === cartItemId);
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
         }
 
-        if (!item) return res.status(404).json({ message: 'Item not found' });
+        let itemIndex = cart.item.findIndex(
+            (i) => i._id.toString() === cartItemId
+        );
 
-       
-        if (type === 'plus') item.quantity += 1;
-        if (type === 'minus') item.quantity = Math.max(1, item.quantity - 1);
+        let targetArray = "item";
 
-      
-        item.sum = item.price * item.quantity;
-        item.totalPrice = item.sum;
+        // check itemOne if not in item
+        if (itemIndex === -1) {
+            itemIndex = cart.itemOne.findIndex(
+                (i) => i._id.toString() === cartItemId
+            );
+            targetArray = "itemOne";
+        }
 
-       
-        const itemTotal = cart.item.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
-        const extraTotal = cart.itemOne.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
+        if (itemIndex === -1) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        const items = cart[targetArray];
+        const item = items[itemIndex];
+
+        // increase
+        if (type === "plus") {
+            item.quantity += 1;
+        }
+
+        // decrease
+        if (type === "minus") {
+            item.quantity -= 1;
+        }
+
+        // 🚀 remove item if quantity <= 0
+        if (item.quantity <= 0) {
+            items.splice(itemIndex, 1);
+        } else {
+            item.sum = item.price * item.quantity;
+            item.totalPrice = item.sum;
+        }
+
+        // recalc cart total
+        const itemTotal = cart.item.reduce(
+            (acc, i) => acc + (i.totalPrice || 0),
+            0
+        );
+
+        const extraTotal = cart.itemOne.reduce(
+            (acc, i) => acc + (i.totalPrice || 0),
+            0
+        );
+
         cart.cartTotal = itemTotal + extraTotal;
 
         await cart.save();
 
-        return res.status(200).json({ message: 'Cart updated', cart });
+        return res.status(200).json({
+            message: "Cart updated",
+            cart,
+        });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Error updating cart' });
+        return res.status(500).json({
+            message: "Error updating cart",
+        });
+    }
+};
+
+
+const getUserCart = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "User not authenticated",
+            });
+        }
+
+        const userId = req.user._id;
+
+        const ownerCart = await Cart.findOne({ userId });
+
+        if (!ownerCart) {
+            return res.status(404).json({
+                message: "Cart not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "User cart fetched successfully",
+            cart: ownerCart,
+        });
+
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+
+        return res.status(500).json({
+            message: "An error occurred",
+            err: error.message,
+        });
+    }
+};
+
+
+const getAll = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const data = await Cart.findById(id);
+
+        if (!data) {
+            return res.status(404).json({
+                message: "Cart not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Cart fetched successfully",
+            cart: data,
+        });
+
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+
+        return res.status(500).json({
+            message: "An error occurred",
+            err: error.message,
+        });
     }
 };
 
@@ -125,5 +224,7 @@ const updateCartItemQuantity = async (req, res) => {
 
 module.exports = {
     createrUserCart,
-    updateCartItemQuantity
+    updateCartItemQuantity,
+    getUserCart,
+    getAll
 };
