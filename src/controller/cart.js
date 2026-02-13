@@ -80,7 +80,50 @@ const createrUserCart = async (req, res) => {
 };
 
 
+const updateCartItemQuantity = async (req, res) => {
+    try {
+        const { cartItemId, type } = req.body; 
+        const userId = req.user._id;
+
+        const cart = await Cart.findOne({ userId });
+
+        if (!cart) return res.status(404).json({ message: 'Cart not found' });
+
+       
+        let item = cart.item.find(i => i._id.toString() === cartItemId);
+        
+        if (!item) {
+            item = cart.itemOne.find(i => i._id.toString() === cartItemId);
+        }
+
+        if (!item) return res.status(404).json({ message: 'Item not found' });
+
+       
+        if (type === 'plus') item.quantity += 1;
+        if (type === 'minus') item.quantity = Math.max(1, item.quantity - 1);
+
+      
+        item.sum = item.price * item.quantity;
+        item.totalPrice = item.sum;
+
+       
+        const itemTotal = cart.item.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
+        const extraTotal = cart.itemOne.reduce((acc, i) => acc + (i.totalPrice || 0), 0);
+        cart.cartTotal = itemTotal + extraTotal;
+
+        await cart.save();
+
+        return res.status(200).json({ message: 'Cart updated', cart });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error updating cart' });
+    }
+};
+
+
 
 module.exports = {
     createrUserCart,
+    updateCartItemQuantity
 };
