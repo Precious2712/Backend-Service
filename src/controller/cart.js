@@ -220,11 +220,58 @@ const getAll = async (req, res) => {
     }
 };
 
+const DeleteProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const userId = req.user._id;
+
+        // remove item first
+        let cart = await Cart.findOneAndUpdate(
+            { userId },
+            {
+                $pull: {
+                    item: { _id: productId },
+                    itemOne: { _id: productId },
+                },
+            },
+            { new: true }
+        );
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        // ✅ recalc totals
+        const itemTotal = cart.item.reduce(
+            (acc, i) => acc + (i.totalPrice || 0),
+            0
+        );
+
+        const extraTotal = cart.itemOne.reduce(
+            (acc, i) => acc + (i.totalPrice || 0),
+            0
+        );
+
+        cart.cartTotal = itemTotal + extraTotal;
+
+        await cart.save();
+
+        res.json({
+            message: "Product removed",
+            cart,
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting product" });
+    }
+};
+
 
 
 module.exports = {
     createrUserCart,
     updateCartItemQuantity,
     getUserCart,
-    getAll
+    getAll,
+    DeleteProduct
 };

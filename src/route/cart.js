@@ -6,7 +6,8 @@ const {
     createrUserCart,
     updateCartItemQuantity,
     getUserCart,
-    getAll
+    getAll,
+    DeleteProduct
 } = require('../controller/cart');
 
 const verifyUserWithToken = require('../middleware/verifyUserToken');
@@ -18,5 +19,7 @@ app.post('/update-cart-item', verifyUserWithToken, updateCartItemQuantity);
 app.get('/get-user-cart', verifyUserWithToken, getUserCart);
 
 app.get('/user/:id', getAll);
+
+app.delete('/delete-product/:id', verifyUserWithToken, DeleteProduct);
 
 module.exports = app;
