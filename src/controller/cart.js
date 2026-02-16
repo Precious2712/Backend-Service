@@ -98,7 +98,7 @@ const updateCartItemQuantity = async (req, res) => {
 
         let targetArray = "item";
 
-        
+
         if (itemIndex === -1) {
             itemIndex = cart.itemOne.findIndex(
                 (i) => i._id.toString() === cartItemId
@@ -113,17 +113,17 @@ const updateCartItemQuantity = async (req, res) => {
         const items = cart[targetArray];
         const item = items[itemIndex];
 
-       
+
         if (type === "plus") {
             item.quantity += 1;
         }
 
-        
+
         if (type === "minus") {
             item.quantity -= 1;
         }
 
-        
+
         if (item.quantity <= 0) {
             items.splice(itemIndex, 1);
         } else {
@@ -228,15 +228,12 @@ const DeleteProduct = async (req, res) => {
         const { productId } = req.params;
         const userId = req.user._id;
 
-        
-        const objectId = new mongoose.Types.ObjectId(productId);
-
-        let cart = await Cart.findOneAndUpdate(
+        const cart = await Cart.findOneAndUpdate(
             { userId },
             {
                 $pull: {
-                    item: { _id: objectId },
-                    itemOne: { _id: objectId },
+                    item: { _id: productId },
+                    itemOne: { _id: productId },
                 },
             },
             { new: true }
@@ -246,7 +243,7 @@ const DeleteProduct = async (req, res) => {
             return res.status(404).json({ message: "Cart not found" });
         }
 
-       
+        
         const itemTotal = cart.item.reduce(
             (acc, i) => acc + (i.totalPrice || 0),
             0
@@ -258,7 +255,6 @@ const DeleteProduct = async (req, res) => {
         );
 
         cart.cartTotal = itemTotal + extraTotal;
-
         await cart.save();
 
         res.json({
@@ -271,6 +267,8 @@ const DeleteProduct = async (req, res) => {
         res.status(500).json({ message: "Error deleting product" });
     }
 };
+
+
 
 
 module.exports = {
