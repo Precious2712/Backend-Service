@@ -20,6 +20,6 @@ app.get('/get-user-cart', verifyUserWithToken, getUserCart);
 
 app.get('/user/:id', getAll);
 
-app.delete('/delete-product/:id', verifyUserWithToken, DeleteProduct);
+app.delete('/delete-product/:productId', verifyUserWithToken, DeleteProduct);
 
 module.exports = app;

@@ -1,4 +1,5 @@
 const Cart = require("../model/cart");
+const mongoose = require("mongoose");
 
 const createrUserCart = async (req, res) => {
     try {
@@ -97,7 +98,7 @@ const updateCartItemQuantity = async (req, res) => {
 
         let targetArray = "item";
 
-        // check itemOne if not in item
+        
         if (itemIndex === -1) {
             itemIndex = cart.itemOne.findIndex(
                 (i) => i._id.toString() === cartItemId
@@ -112,17 +113,17 @@ const updateCartItemQuantity = async (req, res) => {
         const items = cart[targetArray];
         const item = items[itemIndex];
 
-        // increase
+       
         if (type === "plus") {
             item.quantity += 1;
         }
 
-        // decrease
+        
         if (type === "minus") {
             item.quantity -= 1;
         }
 
-        // 🚀 remove item if quantity <= 0
+        
         if (item.quantity <= 0) {
             items.splice(itemIndex, 1);
         } else {
@@ -220,18 +221,22 @@ const getAll = async (req, res) => {
     }
 };
 
+
+
 const DeleteProduct = async (req, res) => {
     try {
         const { productId } = req.params;
         const userId = req.user._id;
 
-        // remove item first
+        
+        const objectId = new mongoose.Types.ObjectId(productId);
+
         let cart = await Cart.findOneAndUpdate(
             { userId },
             {
                 $pull: {
-                    item: { _id: productId },
-                    itemOne: { _id: productId },
+                    item: { _id: objectId },
+                    itemOne: { _id: objectId },
                 },
             },
             { new: true }
@@ -241,7 +246,7 @@ const DeleteProduct = async (req, res) => {
             return res.status(404).json({ message: "Cart not found" });
         }
 
-        // ✅ recalc totals
+       
         const itemTotal = cart.item.reduce(
             (acc, i) => acc + (i.totalPrice || 0),
             0
@@ -262,10 +267,10 @@ const DeleteProduct = async (req, res) => {
         });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Error deleting product" });
     }
 };
-
 
 
 module.exports = {
